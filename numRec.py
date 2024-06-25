@@ -1,31 +1,33 @@
 import cv2
 import easyocr
-import matplotlib.pyplot as plt
+import time
 
 # Initialize the camera
 cap = cv2.VideoCapture(0)
 
-# Capture a single frame
-ret, frame = cap.read()
+# Create an EasyOCR reader object
+reader = easyocr.Reader(['en'])
 
-# Check if the frame was captured successfully
-if ret:
-    # Save the captured image
-    cv2.imwrite('D:/electronicDesign/sendMedicine/captured_image.png', frame)
+while True:
+    # Capture frame-by-frame
+    ret, frame = cap.read()
 
-    # Create an EasyOCR reader object
-    reader = easyocr.Reader(['en'])
+    # Check if frame is captured
+    if ret:
+        # Use EasyOCR to recognize text in the captured frame
+        results = reader.readtext(frame, detail=0, allowlist='12345678')
+        print(results)
 
-    # Use EasyOCR to recognize text in the captured image
-    results = reader.readtext(frame, detail=0, allowlist='12345678')
+        # Display the captured frame
+        # cv2.imshow('Real-time Image', cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        # cv2.waitKey(1)  # Display the window for a short time
 
-    print(results)
+        # Wait for 10 seconds before capturing the next frame
+        # time.sleep(10)
+    else:
+        print("Failed to capture image")
+        break
 
-    # Display the captured image
-    plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-    plt.show()
-else:
-    print("Failed to capture image")
-
-# Release the camera
+# Release the camera and close all windows
 cap.release()
+cv2.destroyAllWindows()
